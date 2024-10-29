@@ -2,16 +2,19 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
-  const [ethPrice, setEthPrice] = useState(null);
-  const [gasFees, setGasFees] = useState({ safe: null, average: null, fast: null });
-  const [transactions, setTransactions] = useState([]);
-  const [balance, setBalance] = useState(null);
-  const [address, setAddress] = useState('');
-  const [error, setError] = useState(null);
-
+  // Define variables to manage different data points
+  const [ethPrice, setEthPrice] = useState(null); // Store ETH price in USD
+  const [gasFees, setGasFees] = useState({ safe: null, average: null, fast: null }); // Store gas fees at different speeds
+  const [transactions, setTransactions] = useState([]); // Store recent transactions
+  const [balance, setBalance] = useState(null); // Store wallet balance in ETH
+  const [address, setAddress] = useState(''); // Store the Ethereum wallet address entered by the user
+  const [error, setError] = useState(null); // Store error messages
+  
+  // URLs for the external APIs
   const COINGECKO_API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd';
   const ETHERSCAN_API_KEY = process.env.REACT_APP_ETHERSCAN_API_KEY;
 
+  // Using CoinGecko's API to fetch the current ETH price
   const fetchEthPrice = async () => {
     try {
       const response = await fetch(COINGECKO_API_URL);
@@ -23,6 +26,7 @@ function App() {
     }
   };
 
+  // Using Etherscan API to fetch gas fees and ETH price when the component loads
   useEffect(() => {
     const GAS_FEES_URL = `https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${ETHERSCAN_API_KEY}`;
   
@@ -46,6 +50,7 @@ function App() {
   }, [ETHERSCAN_API_KEY]);
   
 
+  // Using the Etherscan API to fetch the ETH balance of a crypto wallet
   const fetchWalletBalance = async () => {
     try {
       const BALANCE_URL = `https://api.etherscan.io/api?module=account&action=balance&address=${address}&tag=latest&apikey=${ETHERSCAN_API_KEY}`;
@@ -53,35 +58,38 @@ function App() {
       const response = await fetch(BALANCE_URL);
       if (!response.ok) throw new Error('Failed to fetch balance');
       const data = await response.json();
-      const balanceInEther = parseFloat(data.result) / 1e18;
+      const balanceInEther = parseFloat(data.result) / 1e18; // Convert balance from Wei to Ether
       setBalance(balanceInEther);
     } catch (err) {
       setError(err.message);
     }
   };
 
+  // Fetches the 10 most recent transactions for the entered wallet address
   const fetchRecentTransactions = async () => {
     try {
       const TX_LIST_URL = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=desc&apikey=${ETHERSCAN_API_KEY}`;
 
-      const response = await fetch(TX_LIST_URL);
+      const response = await fetch(TX_LIST_URL); // Make API request
       if (!response.ok) throw new Error('Failed to fetch transactions');
-      const data = await response.json();
+      const data = await response.json(); // Parse JSON response
 
       if (data.status === '0') throw new Error(data.message);
 
-      const recentTransactions = data.result.slice(0, 10);
-      setTransactions(recentTransactions);
+      const recentTransactions = data.result.slice(0, 10); // Limit to 10 most recent transactions
+      setTransactions(recentTransactions); // Update transactions
     } catch (err) {
       setError(err.message);
     }
   };
 
+  // Activate both the balance and transaction fetch functions when the user clicks the 'Get Wallet Data' button
   const handleFetchData = () => {
     fetchWalletBalance();
     fetchRecentTransactions();
   };
 
+  // Generate the app's user interface
   return (
     <div className="App">
       <h1>Ethereum Hub</h1>
