@@ -43,7 +43,7 @@ function App() {
   
     fetchGasFees();
     fetchEthPrice();
-  }, [ETHERSCAN_API_KEY]); // Include it in the dependency array
+  }, [ETHERSCAN_API_KEY]);
   
 
   const fetchWalletBalance = async () => {
@@ -70,7 +70,7 @@ function App() {
 
       if (data.status === '0') throw new Error(data.message);
 
-      const recentTransactions = data.result.slice(0, 10); // Get the 10 most recent transactions
+      const recentTransactions = data.result.slice(0, 10);
       setTransactions(recentTransactions);
     } catch (err) {
       setError(err.message);
