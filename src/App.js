@@ -10,7 +10,7 @@ function App() {
   const [error, setError] = useState(null);
 
   const COINGECKO_API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd';
-  const ETHERSCAN_API_KEY = '172BVE8E9IQ66EJRRCF4NYJT3CKQ5FS8EF';
+  const ETHERSCAN_API_KEY = process.env.REACT_APP_ETHERSCAN_API_KEY;
 
   const fetchEthPrice = async () => {
     try {
@@ -25,7 +25,7 @@ function App() {
 
   useEffect(() => {
     const GAS_FEES_URL = `https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${ETHERSCAN_API_KEY}`;
-
+  
     const fetchGasFees = async () => {
       try {
         const response = await fetch(GAS_FEES_URL);
@@ -40,10 +40,11 @@ function App() {
         setError(err.message);
       }
     };
-
-    fetchEthPrice();
+  
     fetchGasFees();
-  }, []);
+    fetchEthPrice();
+  }, [ETHERSCAN_API_KEY]); // Include it in the dependency array
+  
 
   const fetchWalletBalance = async () => {
     try {
