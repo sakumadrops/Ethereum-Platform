@@ -29,6 +29,7 @@ The **Ethereum Platform App** is a web3 platform that provides Ethereum holders 
 4. Run the project
    ```bash
    npm start
+5. Example Wallet to Use: 0xbd3531da5cf5857e7cfaa92426877b022e612cf8
 
 ## APIs Used
 
